@@ -564,7 +564,7 @@ typedef struct {
  * @node: a #AsNode.
  * @flags: the AsNodeToXmlFlags, e.g. %AS_NODE_TO_XML_FLAG_NONE.
  *
- * Converts a node and it's children to XML.
+ * Converts a node and its children to XML.
  *
  * Returns: (transfer full): a #GString
  *
@@ -1024,7 +1024,7 @@ as_node_from_file (GFile *file,
 			g_strcmp0 (mime_type, "application/x-gzip") == 0) {
 			conv = G_CONVERTER (g_zlib_decompressor_new (G_ZLIB_COMPRESSOR_FORMAT_GZIP));
 			stream_data = g_converter_input_stream_new (file_stream, conv);
-		} else if (g_strcmp0 (mime_type, "application/xml") == 0 ||
+		} else if (g_content_type_is_a (mime_type, "application/xml") ||
 				   g_strcmp0 (mime_type, "text/xml") == 0) {
 			stream_data = g_object_ref (file_stream);
 		}
@@ -1602,7 +1602,6 @@ as_node_insert (AsNode *parent,
 	const gchar *value;
 	AsNodeData *data;
 	AsNode *root = g_node_get_root (parent);
-	guint i;
 	va_list args;
 
 	g_return_val_if_fail (name != NULL, NULL);
@@ -1619,7 +1618,7 @@ as_node_insert (AsNode *parent,
 
 	/* process the attrs valist */
 	va_start (args, insert_flags);
-	for (i = 0;; i++) {
+	while (TRUE) {
 		key = va_arg (args, const gchar *);
 		if (key == NULL)
 			break;
@@ -1775,7 +1774,6 @@ GHashTable *
 as_node_get_localized (const AsNode *node, const gchar *key)
 {
 	AsNodeData *data;
-	AsRefString *data_unlocalized;
 	AsRefString *xml_lang;
 	GHashTable *hash = NULL;
 	AsNode *tmp;
@@ -1785,7 +1783,6 @@ as_node_get_localized (const AsNode *node, const gchar *key)
 	tmp = as_node_get_child_node (node, key, NULL, NULL);
 	if (tmp == NULL)
 		return NULL;
-	data_unlocalized = as_node_get_data_as_refstr (tmp);
 
 	/* find a node called name */
 	hash = g_hash_table_new_full (g_str_hash, g_str_equal,

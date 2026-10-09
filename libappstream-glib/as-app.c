@@ -1341,7 +1341,7 @@ as_app_get_agreements (AsApp *app)
  * @app: a #AsApp instance.
  * @kind: an agreement kind, e.g. %AS_AGREEMENT_KIND_EULA
  *
- * Gets a agreement the application has defined of a specific type.
+ * Gets an agreement the application has defined of a specific type.
  *
  * Returns: (transfer none): a #AsAgreement or NULL for not found
  *
@@ -2627,7 +2627,6 @@ as_app_set_update_contact (AsApp *app, const gchar *update_contact)
 	AsAppPrivate *priv = GET_PRIVATE (app);
 	gboolean done_replacement = TRUE;
 	gchar *tmp;
-	gsize len;
 	guint i;
 	struct {
 		const gchar	*search;
@@ -2655,7 +2654,6 @@ as_app_set_update_contact (AsApp *app, const gchar *update_contact)
 		return;
 
 	/* keep going until we have no more matches */
-	len = (guint) strlen (priv->update_contact);
 	while (done_replacement) {
 		done_replacement = FALSE;
 		for (i = 0; replacements[i].search != NULL; i++) {
@@ -2663,9 +2661,9 @@ as_app_set_update_contact (AsApp *app, const gchar *update_contact)
 					    replacements[i].search);
 			if (tmp != NULL) {
 				*tmp = replacements[i].replace;
-				(void)g_strlcpy (tmp + 1,
-					   tmp + strlen (replacements[i].search),
-					   len);
+				memmove (tmp + 1,
+					 tmp + strlen (replacements[i].search),
+					 strlen (tmp + strlen (replacements[i].search)) + 1);
 				done_replacement = TRUE;
 			}
 		}
@@ -3488,7 +3486,7 @@ as_app_add_content_rating (AsApp *app, AsContentRating *content_rating)
  * @app: a #AsApp instance.
  * @agreement: a #AsAgreement instance.
  *
- * Adds a agreement to an application.
+ * Adds an agreement to an application.
  *
  * Since: 0.7.8
  **/
@@ -3550,7 +3548,7 @@ as_app_check_translation_duplicate (AsTranslation *translation1, AsTranslation *
  * @app: a #AsApp instance.
  * @icon: a #AsIcon instance.
  *
- * Adds a icon to an application.
+ * Adds an icon to an application.
  *
  * Since: 0.3.1
  **/
@@ -3925,7 +3923,7 @@ as_app_add_extends (AsApp *app, const gchar *extends)
  * @app: a #AsApp instance.
  * @addon: a #AsApp instance.
  *
- * Adds a addon to an application.
+ * Adds an addon to an application.
  *
  * Since: 0.1.7
  **/
@@ -4526,7 +4524,7 @@ as_app_node_insert_keywords (AsApp *app, GNode *parent, AsNodeContext *ctx)
 /**
  * as_app_node_insert: (skip)
  * @app: a #AsApp instance.
- * @parent: the parent #GNode to use..
+ * @parent: the parent #GNode to use.
  * @ctx: the #AsNodeContext
  *
  * Inserts the application into the DOM tree.
